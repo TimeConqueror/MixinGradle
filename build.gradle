@@ -19,7 +19,7 @@ apply plugin: 'com.gradle.plugin-publish'
 defaultTasks 'licenseFormat', 'build'
 
 group = 'org.spongepowered'
-version = buildVersion + (buildType == 'RELEASE' ? '' : "-$buildType")
+version = buildVersion + (buildType == 'RELEASE' ? '' : "-$buildType") + "-patched"
 archivesBaseName = 'mixingradle'
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
@@ -122,6 +122,14 @@ pluginBundle {
     }
 }
 
+if(file("time_maven.properties").exists()) {
+    file "time_maven.properties" withReader {
+        def prop = new Properties()
+        prop.load(it)
+        ext.secretProps = new ConfigSlurper().parse prop
+    }
+}
+
 uploadArchives {
     repositories {
 
@@ -132,7 +140,11 @@ uploadArchives {
                 repository(url: project.spongeRepo) {
                     authentication(userName: project.spongeUsername, password: project.spongePassword)
                 }
-            } else  {
+            } else if(secretProps) {
+                repository(url: "https://repo.repsy.io/mvn/${secretProps.repsy.user}/${secretProps.repsy.repo_name}") {
+                    authentication(userName: secretProps.repsy.user, password: secretProps.repsy.password)
+                }
+            } else {
                 repository(url: 'file://' + rootProject.file('repo').getAbsolutePath())
             }
 

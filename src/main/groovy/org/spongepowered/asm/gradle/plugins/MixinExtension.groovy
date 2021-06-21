@@ -252,6 +252,8 @@ public class MixinExtension {
      */
     private Set<Object> importLibs = []
 
+    private Set<String> manualRefmaps = []
+
     /**
      * ctor
      * 
@@ -429,6 +431,10 @@ public class MixinExtension {
      */
     void token(Object name, Object value) {
         this.tokens.put(name.toString().trim(), value.toString().trim())
+    }
+
+    void addManualRefmap(String refmapPath) {
+        this.manualRefmaps.add(refmapPath)
     }
     
     /**
@@ -813,6 +819,10 @@ public class MixinExtension {
         
         if (this.quiet) {
             compileTask.options.compilerArgs += '-Aquiet=true'
+        }
+
+        if(this.manualRefmaps.size() > 0) {
+            compileTask.options.compilerArgs += listToArg("manualRefmaps", this.manualRefmaps.collect {it})
         }
     }
     

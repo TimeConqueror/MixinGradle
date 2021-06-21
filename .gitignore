@@ -76,3 +76,4 @@ nb-configuration.xml
 *.iws
 
 /repo/
+/time_maven.properties
